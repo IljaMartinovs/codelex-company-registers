@@ -14,7 +14,7 @@ while(true){
 $selection = readline('Choose your options: ');
 switch ($selection) {
     case 1:
-        foreach ($companies->lastThirty() as $key => $company) {
+        foreach ($companies->lastRegisters() as $key => $company) {
             echo "[$key] Company name : " . $company->getName() . " | Registration number:" . $company->getRegistrationNumber() . PHP_EOL;
         }
         break;
