@@ -11,9 +11,9 @@ class CompanyCollection {
         $this->companies[]=$company;
     }
 
-    public function lastThirty(): array
+    public function lastRegisters(int $number = 30): array
     {
-        return array_slice($this->companies,-30);
+        return array_slice($this->companies,-$number);
     }
 
     public function searchByName(string $name): ?Company
