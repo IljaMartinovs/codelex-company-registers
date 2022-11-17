@@ -1,59 +1,47 @@
 <?php
 
-require_once 'vendor/autoload.php';
+require_once "vendor/autoload.php";
 
-use App\FullCompany;
-use League\Csv\Reader;
-use League\Csv\Statement;
+use \App\File;
 
-$stream = fopen('register.csv', 'r');
-$csv = Reader::createFromStream($stream);
-$csv->setDelimiter(';');
-$csv->setHeaderOffset(0);
-$header = $csv->getHeader();
+$companies = (new File('register.csv',';'))->getRecords();
 
-$stmt = Statement::create()
-    ->offset(446058);
-
-$records = $stmt->process($csv);
-
-$FullCompanies = [];
-foreach ($records as $record){
-    $FullCompanies []= new FullCompany($record);
-}
-
-do {
+while(true){
     echo "\n1. Print last 30 registers\n";
     echo "2. Find register by company name\n";
     echo "3. Find register by company registration code\n";
-    do {
-        $inputSelect = (int)readline("Choose (1-3): \n");
-    } while ($inputSelect > 4 || $inputSelect < 0);
 
-    switch ($inputSelect){
+$selection = readline('Choose your options: ');
+switch ($selection) {
+    case 1:
+        foreach ($companies->lastThirty() as $key => $company) {
+            echo "[$key] Company name : " . $company->getName() . " | Registration number:" . $company->getRegistrationNumber() . PHP_EOL;
+        }
+        break;
 
-        case 1:
-            for($i=0; $i < count($FullCompanies); $i++) {
-                echo  "[{$i}]  " . $FullCompanies[$i]->getFullCompany() . PHP_EOL;
-            }
-            break;
+    case 2:
+        $companyName = readline('Enter company Name :');
+        $company = $companies->searchByName($companyName);
 
-        case 2:
-            $companyName =  readline("Find by company name : ");
-            foreach ($FullCompanies as $company){
-                if($company->getName() == $companyName){
-                    echo $company->getFullCompany() . PHP_EOL;
-                }
-            }
-            break;
+        if($company){
+           echo "Company is {$company->getName()} | {$company->getRegistrationNumber()}"  . PHP_EOL;
+        } else {
+            echo "Company  not found\n";
+        }
+        break;
 
-        case 3:
-            $registrationCode = readline("Find by register code : ");
-            foreach ($FullCompanies as $company){
-                if($company->getRegistrationCode() == $registrationCode){
-                    echo $company->getFullCompany() . PHP_EOL;
-                }
-            }
-            break;
+    case 3:
+        $companyRegistrationNumber = readline('Enter company Reg Number :');
+        $company = $companies->searchRegistrationNumber($companyRegistrationNumber);
+        if($company){
+            echo "Company is {$company->getName()} | {$company->getRegistrationNumber()}"  . PHP_EOL;
+        } else {
+            echo "Company  not found\n";
+        }
+        break;
+
+    default:
+        exit;
     }
-} while ($inputSelect !== 0);
+}
+
